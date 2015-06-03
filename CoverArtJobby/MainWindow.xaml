@@ -1,0 +1,30 @@
+﻿<Window x:Class="CoverArtJobby.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="785" Width="933" Name="mainWindow" AllowDrop="True" Drop="Tag_Image_Drop">
+    <Grid AllowDrop="True" Height="745" Width="907">
+        <TreeView Height="241" HorizontalAlignment="Left" Margin="12,12,0,0" Name="FolderBrowser" VerticalAlignment="Top" Width="266" />
+        <ListBox Height="429" HorizontalAlignment="Left" Margin="12,288,0,0" Name="FileList" VerticalAlignment="Top" Width="266" SelectionMode="Extended" SelectionChanged="FileList_SelectionChanged" />
+        <GroupBox Header="Current Tag" Height="235" HorizontalAlignment="Left" Margin="284,18,0,0" Name="grpCurrentTag" VerticalAlignment="Top" Width="468">
+            <Grid>
+                <Label Content="File" Height="28" HorizontalAlignment="Left" Margin="12,15,0,0" Name="label1" VerticalAlignment="Top" />
+                <Label Content="Artist" Height="28" HorizontalAlignment="Left" Margin="12,49,0,0" Name="label2" VerticalAlignment="Top" />
+                <Label Content="Album" Height="28" HorizontalAlignment="Left" Margin="12,83,0,0" Name="label3" VerticalAlignment="Top" />
+                <Label Content="Song" Height="28" HorizontalAlignment="Left" Margin="12,117,0,0" Name="label4" VerticalAlignment="Top" />
+                <TextBox Height="23" HorizontalAlignment="Left" Margin="79,15,0,0" Name="Tag_File" VerticalAlignment="Top" Width="150" />
+                <TextBox Height="23" HorizontalAlignment="Left" Margin="79,49,0,0" Name="Tag_Artist" VerticalAlignment="Top" Width="150" />
+                <TextBox Height="23" HorizontalAlignment="Left" Margin="79,83,0,0" Name="Tag_Album" VerticalAlignment="Top" Width="150" />
+                <TextBox Height="23" HorizontalAlignment="Left" Margin="79,117,0,0" Name="Tag_Song" VerticalAlignment="Top" Width="150" />
+                <Button Content="Guess Tags" Height="23" HorizontalAlignment="Left" Margin="79,146,0,0" Name="btnGuessTag" VerticalAlignment="Top" Width="124" Click="btnGuessTag_Click" />
+                <Button Content="Reload Tags" Height="23" HorizontalAlignment="Left" Margin="79,182,0,0" Name="btnReloadTag" VerticalAlignment="Top" Width="124" Click="btnReloadTag_Click" />
+            </Grid>
+        </GroupBox>
+        <Button Content="Search Art (File)" Height="23" HorizontalAlignment="Left" Margin="758,50,0,0" Name="btn_Search_File" VerticalAlignment="Top" Width="124" Click="btn_Search_File_Click" />
+        <Button Content="Exit" Height="23" HorizontalAlignment="Left" Margin="758,681,0,0" Name="btn_Exit" VerticalAlignment="Top" Width="124" Click="btn_Exit_Click" />
+        <CheckBox Content="Recurse Directory" Height="16" HorizontalAlignment="Left" Margin="12,259,0,0" Name="chk_recurse" VerticalAlignment="Top" />
+        <Image Height="417" HorizontalAlignment="Left" Margin="302,288,0,0" Name="Tag_Image" Stretch="Uniform" VerticalAlignment="Top" Width="444" Drop="Tag_Image_Drop" AllowDrop="True" />
+        <TextBox Height="23" HorizontalAlignment="Left" Margin="626,682,0,0" Name="Tag_ImageDims" VerticalAlignment="Top" Width="120" Background="#00000000" BorderBrush="#00000000" Foreground="Blue" TextAlignment="Right" />
+        <Button Content="Save Tag" Height="23" HorizontalAlignment="Left" Margin="758,533,0,0" Name="btnSaveTag" VerticalAlignment="Top" Width="124" Click="btnSaveTag_Click" />
+        <Button Content="Save Tag &amp; Next" Height="23" HorizontalAlignment="Left" Margin="758,0,0,160" Name="btn_SaveAndNext" VerticalAlignment="Bottom" Width="124" />
+    </Grid>
+</Window>

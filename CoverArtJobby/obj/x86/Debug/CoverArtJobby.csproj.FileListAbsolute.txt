@@ -1,0 +1,14 @@
+C:\Code\CoverArtJobby\CoverArtJobby\bin\Debug\CoverArtJobby.exe
+C:\Code\CoverArtJobby\CoverArtJobby\bin\Debug\CoverArtJobby.pdb
+C:\Code\CoverArtJobby\CoverArtJobby\obj\x86\Debug\MainWindow.baml
+C:\Code\CoverArtJobby\CoverArtJobby\obj\x86\Debug\MainWindow.g.cs
+C:\Code\CoverArtJobby\CoverArtJobby\obj\x86\Debug\App.g.cs
+C:\Code\CoverArtJobby\CoverArtJobby\obj\x86\Debug\CoverArtJobby_MarkupCompile.cache
+C:\Code\CoverArtJobby\CoverArtJobby\obj\x86\Debug\CoverArtJobby.g.resources
+C:\Code\CoverArtJobby\CoverArtJobby\obj\x86\Debug\CoverArtJobby.Properties.Resources.resources
+C:\Code\CoverArtJobby\CoverArtJobby\obj\x86\Debug\CoverArtJobby.csproj.GenerateResource.Cache
+C:\Code\CoverArtJobby\CoverArtJobby\obj\x86\Debug\CoverArtJobby.exe
+C:\Code\CoverArtJobby\CoverArtJobby\obj\x86\Debug\CoverArtJobby.pdb
+C:\Code\CoverArtJobby\CoverArtJobby\bin\Debug\Id3Lib.dll
+C:\Code\CoverArtJobby\CoverArtJobby\obj\x86\Debug\CoverArtJobby.csprojResolveAssemblyReference.cache
+C:\Code\CoverArtJobby\CoverArtJobby\bin\Debug\ICSharpCode.SharpZipLib.dll
