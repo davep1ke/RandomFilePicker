@@ -17,6 +17,7 @@ using System.IO;
 using System.Web;
 using System.Net;
 using Id3Lib;
+using Mp3Lib;
 
 namespace CoverArtJobby
 {
@@ -27,8 +28,7 @@ namespace CoverArtJobby
     {
         private bool imageUpdated = false;
         private bool tagsUpdated = false;
-        private TagModel tagModel = new TagModel();
-        private TagHandler tagHandler = null;
+        Mp3File file = null;
         
 
 
@@ -146,7 +146,7 @@ namespace CoverArtJobby
                 }
                 else
                 {
-                    FileList.ItemsSource = di.EnumerateFiles();
+                    FileList.ItemsSource = di.EnumerateFiles("*");
                 }
             }
         }
@@ -154,6 +154,25 @@ namespace CoverArtJobby
         {
             refreshCurrentTag();
 
+        }
+
+        public void selectNextItem(bool missingArt)
+        {
+            int currentIndex = FileList.SelectedIndex;
+
+            bool exit = false;
+            while(exit == false && currentIndex > -1 && currentIndex < FileList.Items.Count)
+            {
+                currentIndex++;
+                FileList.SelectedIndex = currentIndex;
+
+
+                if (!missingArt || file.TagHandler.Picture == null)
+                {
+                    exit = true;
+                }
+
+            }
 
         }
 
@@ -169,31 +188,34 @@ namespace CoverArtJobby
             {
                 try
                 {
-                    FileInfo file = FileList.SelectedItems[0] as FileInfo;
+                    FileInfo fi = FileList.SelectedItems[0] as FileInfo;
+                    file = new Mp3File(fi);
+                    Tag_File.Text = fi.Name;
 
-                    tagModel = Id3Lib.TagManager.Deserialize(file.OpenRead());
-                    tagHandler = new TagHandler(tagModel);
-
-
-                    if (tagHandler.Picture != null)
+                    
+                    if (file.TagHandler.Picture != null)
                     {
-                        SetImageFromBitmap(tagHandler.Picture, false);
+                        SetImageFromBitmap(file.TagHandler.Picture, false);
                     }
                     else
                     {
                         Tag_Image.Source = null;
                     }
-                    Tag_Album.Text = tagHandler.Album;
-                    Tag_Artist.Text = tagHandler.Artist;
-                    Tag_File.Text = file.Name;
-                    Tag_Song.Text = tagHandler.Song;
+                    Tag_Album.Text = file.TagHandler.Album;
+                    Tag_Artist.Text = file.TagHandler.Artist;
+                    
+                    Tag_Song.Text = file.TagHandler.Song;
                     imageUpdated = false;
                     tagsUpdated = false;
+
+                    webFrame.Visibility = System.Windows.Visibility.Hidden;
 
                 }
                 catch (Id3Lib.Exceptions.TagNotFoundException)
                 {
+                    //drop out if no tag. Should still be able to write one.
 
+                    file = null;
                 }
                 catch (Exception e)
                 {
@@ -260,11 +282,22 @@ namespace CoverArtJobby
             System.Windows.IDataObject data = e.Data;
             string[] formats = data.GetFormats();
 
-
-            if (formats.Contains("text/html"))
+            object obj = null;
+            bool found = false;
+            if (formats.Contains("text/html") )
             {
 
-                var obj = data.GetData("text/html");
+                obj = data.GetData("text/html");
+                found = true;
+            }
+            else if (formats.Contains("HTML Format") )
+            {
+                obj = data.GetData("HTML Format");
+                found = true;
+            }
+            if (found)
+            {
+                
                 string html = string.Empty;
                 if (obj is string)
                 {
@@ -317,6 +350,40 @@ namespace CoverArtJobby
             refreshCurrentTag();
         }
 
+        public void saveTags()
+        {
+            if (imageUpdated)
+            {
+
+                System.Drawing.Image image = Tag_Image.Tag as System.Drawing.Image;
+                //Bitmap b = Tag_Image.Tag as Bitmap;
+                file.TagHandler.Picture = image;
+            }
+
+            if (tagsUpdated)
+            {
+                file.TagHandler.Album = Tag_Album.Text;
+                file.TagHandler.Artist = Tag_Artist.Text;
+                file.TagHandler.Song = Tag_Song.Text;
+            }
+            try
+            {
+                file.Update();
+                //delete any bak files
+                string bakName = System.IO.Path.ChangeExtension(file.FileName, "bak");
+                FileInfo bakfile = new FileInfo(bakName);
+                if (bakfile.Exists)
+                {
+                    bakfile.Delete();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
         #endregion
 
         //Load image
@@ -354,48 +421,59 @@ namespace CoverArtJobby
         private void btn_Search_File_Click(object sender, RoutedEventArgs e)
         {
             string filename = Tag_File.Text;
+            
             //drop the extension
-
             var match = new Regex(@"(.*)\..+").Match(filename);
             if (match.Success)
             {
                 filename = match.Groups[1].Value;
             }
+            //remove ampersands (break URLs)
+            filename = filename.Replace("&", "");
 
-
-            string URL = "https://www.google.co.uk/search?safe=off&source=lnms&tbm=isch&q=";
+            string URL = "https://www.google.co.uk/search?safe=off&source=lnms&tbm=isch&tbs=imgo:1&q=";
             URL += Uri.EscapeUriString(filename);
 
             //string cleaned = 
 //            string URL = "https://www.google.co.uk/search?q=" + Tag_File.Text.Replace(" ","+") +"&safe=off&source=lnms&tbm=isch";
-            System.Diagnostics.Process.Start(URL);
+
+            if (chkEmbedSearch.IsChecked == true)
+            {
+                webFrame.Visibility = System.Windows.Visibility.Visible;
+                webFrame.Navigate(URL);
+            }
+            else
+            {
+                System.Diagnostics.Process.Start(URL);
+            }
 
         }
 
         private void btnSaveTag_Click(object sender, RoutedEventArgs e)
         {
-            
-            if (imageUpdated)
-            {
-                
-                System.Drawing.Image image = Tag_Image.Tag as System.Drawing.Image;
-                //Bitmap b = Tag_Image.Tag as Bitmap;
-                tagHandler.Picture = image;
-            }
 
-            if (tagsUpdated)
-            {
-                 tagHandler.Album = Tag_Album.Text ;
-                 tagHandler.Artist = Tag_Artist.Text;
-                 tagHandler.Song = Tag_Song.Text;
-            }
-
-            FileInfo fi = FileList.SelectedItems[0] as FileInfo;
-            FileStream fs = fi.OpenWrite();
-            TagManager.Serialize(tagModel, fs) ;
-            fs.Close();
+            saveTags();
+       
         }
 
+        private void btn_SaveNextEmpty_Click(object sender, RoutedEventArgs e)
+        {
+            saveTags();
+            selectNextItem(true);
+        }
+
+        private void btnNextEmpty_Click(object sender, RoutedEventArgs e)
+        {
+            selectNextItem(true);
+        }
+
+        private void btn_SaveAndNext_Click(object sender, RoutedEventArgs e)
+        {
+            saveTags();
+            selectNextItem(false);
+        }
+
+ 
 
 
 

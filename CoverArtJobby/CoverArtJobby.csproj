@@ -42,6 +42,9 @@
     <Reference Include="Id3Lib">
       <HintPath>lib\Id3Lib.dll</HintPath>
     </Reference>
+    <Reference Include="Mp3Lib">
+      <HintPath>lib\Mp3Lib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />

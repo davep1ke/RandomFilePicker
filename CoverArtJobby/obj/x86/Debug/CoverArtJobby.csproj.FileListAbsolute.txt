@@ -12,3 +12,6 @@ C:\Code\CoverArtJobby\CoverArtJobby\obj\x86\Debug\CoverArtJobby.pdb
 C:\Code\CoverArtJobby\CoverArtJobby\bin\Debug\Id3Lib.dll
 C:\Code\CoverArtJobby\CoverArtJobby\obj\x86\Debug\CoverArtJobby.csprojResolveAssemblyReference.cache
 C:\Code\CoverArtJobby\CoverArtJobby\bin\Debug\ICSharpCode.SharpZipLib.dll
+C:\Code\CoverArtJobby\CoverArtJobby\bin\Debug\Mp3Lib.dll
+C:\Code\CoverArtJobby\CoverArtJobby\bin\Debug\Id3Lib.pdb
+C:\Code\CoverArtJobby\CoverArtJobby\bin\Debug\Mp3Lib.pdb
