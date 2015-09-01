@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using WinForms = System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -29,7 +30,11 @@ namespace CoverArtJobby
         private bool imageUpdated = false;
         private bool tagsUpdated = false;
         Mp3File file = null;
-        
+
+        //class var to prevent memory leakage
+        private Bitmap imageBitmap;
+
+        public DirectoryInfo backupDirectory = null;
 
 
         public MainWindow()
@@ -44,7 +49,11 @@ namespace CoverArtJobby
             tryExpand(FolderBrowser.Items, @"Dropbox");
             tryExpand(FolderBrowser.Items, @"Music");
             tryExpand(FolderBrowser.Items, @"musictemp",true);
-            
+
+            backupDirectory = new DirectoryInfo(@"C:\musictemp");
+            txtBackupFolder.Text = backupDirectory.FullName;
+            chk_recurse.IsChecked = true;
+            chk_autosearch_file.IsChecked = true;
 
         }
         #region FolderBrowser
@@ -161,16 +170,57 @@ namespace CoverArtJobby
             int currentIndex = FileList.SelectedIndex;
 
             bool exit = false;
+            bool invalidTag = false;
             while(exit == false && currentIndex > -1 && currentIndex < FileList.Items.Count)
             {
+                invalidTag = false;
                 currentIndex++;
-                FileList.SelectedIndex = currentIndex;
+                //open the file (peek at it, then close, to make sure we don't OOM
+                FileInfo fi = FileList.Items[currentIndex] as FileInfo;
+                Mp3File peekFile = new Mp3File(fi);
+               
 
-
-                if (!missingArt || file.TagHandler.Picture == null)
+                //check for unsupported tags
+                try
                 {
-                    exit = true;
+                    if (peekFile.TagHandler.Picture == null)
+                    {
+                        //null test to see if the picture errors. Probably not needed
+                    }
                 }
+                catch (NotImplementedException e)
+                {
+                    MessageBox.Show("Invalid tag on " + peekFile.FileName + " - " + e.Message);
+                    invalidTag = true;
+                }
+
+                //if we are not looking for artwork, exit
+                //or, if we have a valid tag, and it has a pic, exit 
+                
+                if (missingArt) //looking for next file with missing artwork
+                {
+                    //skip invalid tags
+                    if (!invalidTag && peekFile.TagHandler.Picture == null)
+                    {
+                        FileList.SelectedIndex = currentIndex;
+                        exit = true;
+                    }
+                }
+                else //looking for next valid file
+                {
+                    if (!invalidTag)
+                    {
+                        FileList.SelectedIndex = currentIndex;
+                        exit = true;
+                    }
+                }
+
+                
+                //peekFile = null;
+                //fi = null;
+                //GC as the unmanaged code is a memory whore
+                GC.Collect(GC.MaxGeneration);
+                GC.WaitForPendingFinalizers();
 
             }
 
@@ -189,6 +239,9 @@ namespace CoverArtJobby
                 try
                 {
                     FileInfo fi = FileList.SelectedItems[0] as FileInfo;
+
+                    if (file != null) { file = null; }
+
                     file = new Mp3File(fi);
                     Tag_File.Text = fi.Name;
 
@@ -233,14 +286,14 @@ namespace CoverArtJobby
         private void SetImageFromBitmap(System.Drawing.Image image, bool updateID3)
         {
             
-            Bitmap b = new Bitmap(image);
-            BitmapSource bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(b.GetHbitmap(),
+            imageBitmap = new Bitmap(image);
+            BitmapSource bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(imageBitmap.GetHbitmap(),
               IntPtr.Zero,
               System.Windows.Int32Rect.Empty,
-              BitmapSizeOptions.FromWidthAndHeight(b.Width, b.Height));
-
+              BitmapSizeOptions.FromWidthAndHeight(imageBitmap.Width, imageBitmap.Height));
+            
             Tag_Image.Source = bs;
-            Tag_ImageDims.Text = b.Width.ToString() + "x" + b.Height.ToString();
+            Tag_ImageDims.Text = imageBitmap.Width.ToString() + "x" + imageBitmap.Height.ToString();
 
             if (updateID3)
             {
@@ -274,7 +327,7 @@ namespace CoverArtJobby
 
 
 
-        private void Tag_Image_Drop(object sender, DragEventArgs e)
+        private void Tag_Image_Drop(object sender, System.Windows.DragEventArgs e)
         {
             //should be a URL or a file URI
             //http://stackoverflow.com/questions/8442085/receiving-an-image-dragged-from-web-page-to-wpf-window
@@ -368,13 +421,23 @@ namespace CoverArtJobby
             }
             try
             {
+
+
                 file.Update();
                 //delete any bak files
                 string bakName = System.IO.Path.ChangeExtension(file.FileName, "bak");
                 FileInfo bakfile = new FileInfo(bakName);
                 if (bakfile.Exists)
                 {
-                    bakfile.Delete();
+                    if (chk_Backup.IsChecked == true)
+                    {
+                        string location = backupDirectory.FullName + @"\" + System.IO.Path.GetFileName(file.FileName);
+                        bakfile.MoveTo(location);
+                    }
+                    else
+                    {
+                        bakfile.Delete();
+                    }
                 }
 
             }
@@ -386,25 +449,28 @@ namespace CoverArtJobby
 
         #endregion
 
-        //Load image
-            //        _openFileDialog.Multiselect= false;
-            //_openFileDialog.CheckFileExists = true;
-            //_openFileDialog.CheckPathExists = true;
-            //_openFileDialog.Title = "Select a picture";
-            //_openFileDialog.Filter = "Picture Files(*.bmp;*.jpg;*.gif;*.png)|*.bpm;*.jpg;*.gif;*.png|Bitmap (*.bmp)|*.bmp|jpg (*.jpg)|*.jpg|jpeg (*.jpeg)|*.jpeg|gif (*.gif)|*.gif|gif (*.png)|*.png";
-            //if(_openFileDialog.ShowDialog() == DialogResult.OK)
-            //{ 
-            //    using (FileStream stream = File.Open(_openFileDialog.FileName,FileMode.Open,FileAccess.Read,FileShare.Read))
-            //    {
-            //        byte[] buffer = new Byte[stream.Length];
-            //        stream.Read(buffer,0,buffer.Length);
-            //        if(buffer != null)
-            //        {
-            //            MemoryStream memoryStream = new MemoryStream(buffer,false);
-            //            this._artPictureBox.Image = Image.FromStream(memoryStream);
-            //        }
-            //    }
-            //}
+
+        #region backups
+
+        private void btnPickFolder_Click(object sender, RoutedEventArgs e)
+        {
+            WinForms.FolderBrowserDialog fb = new WinForms.FolderBrowserDialog();
+            if (backupDirectory != null) { fb.SelectedPath = backupDirectory.FullName; }
+            fb.Description = "Select a backup location";
+            WinForms.DialogResult r = fb.ShowDialog();
+            if (fb.SelectedPath != null) 
+            { 
+                backupDirectory = new DirectoryInfo(fb.SelectedPath);
+                txtBackupFolder.Text = backupDirectory.FullName;
+            }
+
+        }
+
+
+
+        #endregion
+
+
 
 
 
@@ -420,22 +486,38 @@ namespace CoverArtJobby
 
         private void btn_Search_File_Click(object sender, RoutedEventArgs e)
         {
-            string filename = Tag_File.Text;
-            
+            search_fileName();
+        }
+
+        private void search_fileName()
+        {
+            string filename = "";
             //drop the extension
-            var match = new Regex(@"(.*)\..+").Match(filename);
+            var match = new Regex(@"(.*)\..+").Match(Tag_File.Text);
             if (match.Success)
             {
                 filename = match.Groups[1].Value;
             }
+
+            doSearch(filename);
+
+        }
+
+        private void doSearch(string searchString)
+        {
+            
+            
             //remove ampersands (break URLs)
-            filename = filename.Replace("&", "");
+            searchString = searchString.Replace("&", "");
+            searchString = searchString.Replace("_", " ");
+            //remove hyphens - google assumes it is to ignore next term
+            searchString = searchString.Replace("-", " ");
 
             string URL = "https://www.google.co.uk/search?safe=off&source=lnms&tbm=isch&tbs=imgo:1&q=";
-            URL += Uri.EscapeUriString(filename);
+            URL += Uri.EscapeUriString(searchString);
 
             //string cleaned = 
-//            string URL = "https://www.google.co.uk/search?q=" + Tag_File.Text.Replace(" ","+") +"&safe=off&source=lnms&tbm=isch";
+            //            string URL = "https://www.google.co.uk/search?q=" + Tag_File.Text.Replace(" ","+") +"&safe=off&source=lnms&tbm=isch";
 
             if (chkEmbedSearch.IsChecked == true)
             {
@@ -449,10 +531,13 @@ namespace CoverArtJobby
 
         }
 
+        #region righbuttons
+
         private void btnSaveTag_Click(object sender, RoutedEventArgs e)
         {
 
             saveTags();
+            autoSearch();
        
         }
 
@@ -460,20 +545,30 @@ namespace CoverArtJobby
         {
             saveTags();
             selectNextItem(true);
+            autoSearch();
         }
 
         private void btnNextEmpty_Click(object sender, RoutedEventArgs e)
         {
             selectNextItem(true);
+            autoSearch();
         }
 
         private void btn_SaveAndNext_Click(object sender, RoutedEventArgs e)
         {
             saveTags();
             selectNextItem(false);
+            autoSearch();
         }
 
- 
+        private void autoSearch()
+        {
+            if (chk_autosearch_file.IsChecked == true) { search_fileName(); }
+        }
+
+        #endregion
+
+
 
 
 
