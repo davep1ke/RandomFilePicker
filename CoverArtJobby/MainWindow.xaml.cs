@@ -23,6 +23,7 @@ using Mp3Lib;
 
 namespace CoverArtJobby
 {
+    //test commit
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
