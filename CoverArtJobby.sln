@@ -5,10 +5,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoverArtJobby", "CoverArtJo
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug - background|x86 = Debug - background|x86
+		Debug - live|x86 = Debug - live|x86
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{52550DE5-F150-43B8-90F7-83BB4BE02CB8}.Debug - background|x86.ActiveCfg = Debug - background|x86
+		{52550DE5-F150-43B8-90F7-83BB4BE02CB8}.Debug - background|x86.Build.0 = Debug - background|x86
+		{52550DE5-F150-43B8-90F7-83BB4BE02CB8}.Debug - live|x86.ActiveCfg = Debug - live|x86
+		{52550DE5-F150-43B8-90F7-83BB4BE02CB8}.Debug - live|x86.Build.0 = Debug - live|x86
 		{52550DE5-F150-43B8-90F7-83BB4BE02CB8}.Debug|x86.ActiveCfg = Debug|x86
 		{52550DE5-F150-43B8-90F7-83BB4BE02CB8}.Debug|x86.Build.0 = Debug|x86
 		{52550DE5-F150-43B8-90F7-83BB4BE02CB8}.Release|x86.ActiveCfg = Release|x86

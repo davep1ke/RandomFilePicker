@@ -4,11 +4,12 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using WinForms = System.Windows.Forms;
-using System.Windows.Input;
+using WinControl = System.Windows.Forms.Control;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -29,35 +30,81 @@ namespace CoverArtJobby
     {
         private bool imageUpdated = false;
         private bool tagsUpdated = false;
+        public bool runInBackground = false;
         Mp3File file = null;
 
         //class var to prevent memory leakage
         private Bitmap imageBitmap;
 
+        //various directories 
         public DirectoryInfo backupDirectory = null;
-
+        public DirectoryInfo scanDirectory = null;
+        public DirectoryInfo destinationDirectory = null;
 
         public MainWindow()
         {
+            this.Hide();
             InitializeComponent();
+            
+
+        }
+
+        public void postSetup()
+        {
             populate_Treeview_Drives();
 
-            //todo - store/load previous folder. 
+            //go to the scan folder
+            if (scanDirectory != null)
+            {
+                expandFolder(scanDirectory, true);
+            }
+
+
+            /*
             tryExpand(FolderBrowser.Items, @"C:\");
             tryExpand(FolderBrowser.Items, @"Users");
             tryExpand(FolderBrowser.Items, @"Phil");
             tryExpand(FolderBrowser.Items, @"Dropbox");
             tryExpand(FolderBrowser.Items, @"Music");
             tryExpand(FolderBrowser.Items, @"musictemp",true);
-
             backupDirectory = new DirectoryInfo(@"C:\musictemp");
-            txtBackupFolder.Text = backupDirectory.FullName;
-            chk_recurse.IsChecked = true;
+            */
+
+            if (backupDirectory != null)
+            {
+                txtBackupFolder.Text = backupDirectory.FullName;
+            }
+            //chk_recurse.IsChecked = true; - now done by command line
             chk_autosearch_file.IsChecked = true;
 
+            if (runInBackground)
+            {
+                backgroundScan();   
+            }
+            else
+            {
+                this.Show(); 
+            }
+
         }
+
         #region FolderBrowser
-        
+
+        /// <summary>
+        /// Try navigate to a folder recursively, from a lowest level folder updwards. Select it if neccessary
+        /// </summary>
+        /// <param name="di"></param>
+        public void expandFolder(DirectoryInfo di, bool selectFolder)
+        {
+            //Expand the folder above, if there is one
+            if (di.Parent != null)
+            {
+                expandFolder(di.Parent, false);
+            }
+            //now expand the actual folder, which should be exposed. Lat call should be =true(if passed in as original param) and the folder should be selected. 
+            tryExpand(FolderBrowser.Items, di.Name, selectFolder );
+        }
+
         public void tryExpand(ItemCollection rootCollection, string name, bool select = false)
         {
             
@@ -67,25 +114,63 @@ namespace CoverArtJobby
                 if (i.Header.ToString().ToUpper() == name.ToUpper()) {
                     if (select)
                     {
+                        
                         i.IsSelected = true;
+                        SetSelected(FolderBrowser, i);
+                    
                     }
-                    else
-                    {
-                        i.IsExpanded = true;
-                    }
+                    else{i.IsExpanded = true;}
                 
                 }
                 //if it is just our "loading.." message, drop out
                 if (!((i.Items.Count == 1) && (i.Items[0] is string)))
                 {
-                    tryExpand(i.Items, name);
+                    tryExpand(i.Items, name, select);
                 }
             }
 
             FolderBrowser.UpdateLayout();
         }
 
-        
+
+        static private bool SetSelected(ItemsControl parent, object child)
+        {
+
+            if (parent == null || child == null)
+            {
+                return false;
+            }
+
+            TreeViewItem childNode = parent.ItemContainerGenerator
+                .ContainerFromItem(child) as TreeViewItem;
+
+            if (childNode != null)
+            {
+                childNode.Focus();
+                return childNode.IsSelected = true;
+            }
+
+            if (parent.Items.Count > 0)
+            {
+                foreach (object childItem in parent.Items)
+                {
+                    ItemsControl childControl = parent
+                        .ItemContainerGenerator
+                        .ContainerFromItem(childItem)
+                        as ItemsControl;
+
+                    if (SetSelected(childControl, child))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+
+
 
         public void populate_Treeview_Drives()
         {
@@ -165,15 +250,52 @@ namespace CoverArtJobby
 
         }
 
-        public void selectNextItem(bool missingArt)
+        /// <summary>
+        /// runs the scan in the background, then pops open the window when it finds a file without an image. 
+        /// </summary>
+        public void backgroundScan()
+        {
+            if (FileList.Items.Count > 0)
+            {
+                //select our first file, and scan for a file without an image
+                FileList.SelectedIndex = 0;
+                if (selectNextItem(true, true))
+                {
+                    this.Show();
+                }
+                else
+                {
+                    //no file found
+                    this.Close();
+                }
+            }
+            //no files, close
+            else
+            {
+                this.Close();
+            }
+        }
+
+        /// <summary>
+        /// Scans for the next file. Returns false if no files found
+        /// </summary>
+        /// <param name="missingArt">Only stops when we find a file with missing art</param>
+        /// <param name="startAtOne">Check the current file as well</param>
+        public bool selectNextItem(bool missingArt, bool startAtZero)
         {
             int currentIndex = FileList.SelectedIndex;
 
+            bool firstItem = true;
             bool exit = false;
             bool invalidTag = false;
             while(exit == false && currentIndex > -1 && currentIndex < FileList.Items.Count)
             {
                 invalidTag = false;
+                if (firstItem && startAtZero)
+                {
+                    currentIndex--;
+                }
+                firstItem = false;
                 currentIndex++;
                 //open the file (peek at it, then close, to make sure we don't OOM
                 FileInfo fi = FileList.Items[currentIndex] as FileInfo;
@@ -223,7 +345,8 @@ namespace CoverArtJobby
                 GC.WaitForPendingFinalizers();
 
             }
-
+            //return true if we found a file, false if we didnt. 
+            return exit;
         }
 
         
@@ -388,13 +511,7 @@ namespace CoverArtJobby
                         SetImageFromUri(uri);
                     }
                 }
-                
-                
-
-
             }
-
-
         }
 
 
@@ -422,9 +539,9 @@ namespace CoverArtJobby
             try
             {
 
-
                 file.Update();
-                //delete any bak files
+
+                //move / delete any bak files
                 string bakName = System.IO.Path.ChangeExtension(file.FileName, "bak");
                 FileInfo bakfile = new FileInfo(bakName);
                 if (bakfile.Exists)
@@ -439,6 +556,17 @@ namespace CoverArtJobby
                         bakfile.Delete();
                     }
                 }
+
+                
+                //move file to output folder (if selected)
+                if (destinationDirectory != null)
+                {
+                    FileInfo fi = new FileInfo(file.FileName);
+                    file = null;
+                    fi.MoveTo(destinationDirectory.FullName + "\\" + fi.Name);
+                }
+
+
 
             }
             catch (Exception ex)
@@ -535,35 +663,59 @@ namespace CoverArtJobby
 
         private void btnSaveTag_Click(object sender, RoutedEventArgs e)
         {
-
-            saveTags();
-            autoSearch();
-       
+            //remove the accidental presses due to the goddawfull handling of focus in the webbrowser
+            if (validPress())
+            {
+                saveTags();
+                autoSearch();
+            }
         }
 
         private void btn_SaveNextEmpty_Click(object sender, RoutedEventArgs e)
         {
-            saveTags();
-            selectNextItem(true);
-            autoSearch();
+            //remove the accidental presses due to the goddawfull handling of focus in the webbrowser
+            if (validPress())
+            {
+                saveTags();
+                selectNextItem(true, false);
+                autoSearch();
+            }
         }
 
         private void btnNextEmpty_Click(object sender, RoutedEventArgs e)
         {
-            selectNextItem(true);
-            autoSearch();
+            //remove the accidental presses due to the goddawfull handling of focus in the webbrowser
+            if (validPress())
+            {
+                selectNextItem(true, false);
+                autoSearch();
+            }
         }
 
         private void btn_SaveAndNext_Click(object sender, RoutedEventArgs e)
         {
-            saveTags();
-            selectNextItem(false);
-            autoSearch();
+            //remove the accidental presses due to the goddawfull handling of focus in the webbrowser
+            if (validPress())
+            {
+                saveTags();
+                selectNextItem(false, false);
+                autoSearch();
+            }
         }
 
         private void autoSearch()
         {
             if (chk_autosearch_file.IsChecked == true) { search_fileName(); }
+        }
+
+
+        private bool validPress()
+        {
+            if (WinControl.ModifierKeys == WinForms.Keys.Alt)
+            {
+                return true;
+            }
+            return false;
         }
 
         #endregion

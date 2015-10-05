@@ -6,7 +6,14 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <TreeView Height="241" HorizontalAlignment="Left" Margin="12,12,0,0" Name="FolderBrowser" VerticalAlignment="Top" Width="266" ItemsSource="{Binding}" />
+        <TreeView Height="241" HorizontalAlignment="Left" Margin="12,12,0,0" Name="FolderBrowser" VerticalAlignment="Top" Width="266" ItemsSource="{Binding}">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="TreeViewItem">
+                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+        </TreeView>
         <ListBox HorizontalAlignment="Left" Margin="12,281,0,0" Name="FileList" VerticalAlignment="Stretch" Width="266" SelectionMode="Extended" SelectionChanged="FileList_SelectionChanged" />
         <GroupBox Header="Current Tag" Height="235" HorizontalAlignment="Left" Margin="284,18,0,0" Name="grpCurrentTag" VerticalAlignment="Top" Width="396">
             <Grid>
