@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C# Express 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomFilePicker", "RandomFilePicker.csproj", "{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug cache|Any CPU = Debug cache|Any CPU
+		Debug choose|Any CPU = Debug choose|Any CPU
+		Debug eps|Any CPU = Debug eps|Any CPU
+		Debug file|Any CPU = Debug file|Any CPU
+		Debug FirstFileOnly|Any CPU = Debug FirstFileOnly|Any CPU
+		Debug Help|Any CPU = Debug Help|Any CPU
+		Debug Override|Any CPU = Debug Override|Any CPU
+		Debug Shuffle|Any CPU = Debug Shuffle|Any CPU
+		Debug Thread|Any CPU = Debug Thread|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug cache|Any CPU.ActiveCfg = Release|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug cache|Any CPU.Build.0 = Release|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug choose|Any CPU.ActiveCfg = Debug choose|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug choose|Any CPU.Build.0 = Debug choose|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug eps|Any CPU.ActiveCfg = Debug eps|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug eps|Any CPU.Build.0 = Debug eps|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug file|Any CPU.ActiveCfg = Debug file|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug file|Any CPU.Build.0 = Debug file|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug FirstFileOnly|Any CPU.ActiveCfg = Debug FirstFileOnly|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug FirstFileOnly|Any CPU.Build.0 = Debug FirstFileOnly|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug Help|Any CPU.ActiveCfg = Debug Help|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug Help|Any CPU.Build.0 = Debug Help|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug Override|Any CPU.ActiveCfg = Debug Override|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug Override|Any CPU.Build.0 = Debug Override|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug Shuffle|Any CPU.ActiveCfg = Debug Shuffle|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug Shuffle|Any CPU.Build.0 = Debug Shuffle|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug Thread|Any CPU.ActiveCfg = Debug Thread|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug Thread|Any CPU.Build.0 = Debug Thread|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77B33AF9-E5F8-4EAA-B15F-F6AA152F7CBE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
