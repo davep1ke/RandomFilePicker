@@ -25,12 +25,13 @@
                 <TextBox Height="23" HorizontalAlignment="Left" Margin="63,78,0,0" Name="Tag_Artist" VerticalAlignment="Top" Width="155" />
                 <TextBox Height="23" HorizontalAlignment="Left" Margin="63,112,0,0" Name="Tag_Album" VerticalAlignment="Top" Width="155" />
                 <TextBox Height="23" HorizontalAlignment="Left" Margin="63,146,0,0" Name="Tag_Song" VerticalAlignment="Top" Width="155" />
-                <Button Content="Guess Tags" Height="23" HorizontalAlignment="Left" Margin="12,181,0,0" Name="btnGuessTag" VerticalAlignment="Top" Width="124" Click="btnGuessTag_Click" />
+                <Button Content="Guess Tags" Height="23" HorizontalAlignment="Left" Margin="229,78,0,0" Name="btnGuessTag" VerticalAlignment="Top" Width="124" Click="btnGuessTag_Click" />
                 <Button Content="Reload Tags" Height="23" HorizontalAlignment="Left" Margin="142,181,0,0" Name="btnReloadTag" VerticalAlignment="Top" Width="124" Click="btnReloadTag_Click" />
                 <Button Content="Search Art (File)" Height="23" HorizontalAlignment="Left" Margin="229,44,0,0" Name="btn_Search_File" VerticalAlignment="Top" Width="124" Click="btn_Search_File_Click" />
                 <CheckBox Content="Embed Search" Height="16" HorizontalAlignment="Left" Margin="283,185,0,0" Name="chkEmbedSearch" VerticalAlignment="Top" IsChecked="True" />
                 <CheckBox Height="16" HorizontalAlignment="Left" Margin="358,49,0,0" Name="chk_autosearch_file" VerticalAlignment="Top" />
                 <Label Content="Auto" Height="28" HorizontalAlignment="Left" Margin="346,14,0,0" Name="label5" VerticalAlignment="Top" />
+                <CheckBox Height="16" HorizontalAlignment="Left" Margin="358,81,0,0" x:Name="chk_autoguesstag" VerticalAlignment="Top" />
             </Grid>
         </GroupBox>
         <Button Content="Exit" Height="23" HorizontalAlignment="Right" Margin="0,0,8,12" Name="btn_Exit" VerticalAlignment="Bottom" Width="124" Click="btn_Exit_Click" Grid.Column="2" IsDefault="True" />

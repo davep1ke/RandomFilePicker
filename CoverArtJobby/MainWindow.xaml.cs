@@ -23,7 +23,6 @@ using Mp3Lib;
 
 namespace CoverArtJobby
 {
-    //test commit2
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -77,6 +76,7 @@ namespace CoverArtJobby
             }
             //chk_recurse.IsChecked = true; - now done by command line
             chk_autosearch_file.IsChecked = true;
+            chk_autoguesstag.IsChecked = true;
 
             if (runInBackground)
             {
@@ -385,6 +385,11 @@ namespace CoverArtJobby
                     imageUpdated = false;
                     tagsUpdated = false;
 
+                    if (chk_autoguesstag.IsChecked == true)
+                    {
+                        guessTags(false);
+                    }
+
                     webFrame.Visibility = System.Windows.Visibility.Hidden;
 
                 }
@@ -460,19 +465,16 @@ namespace CoverArtJobby
             string[] formats = data.GetFormats();
 
             object obj = null;
-            bool found = false;
             if (formats.Contains("text/html") )
             {
-
                 obj = data.GetData("text/html");
-                found = true;
             }
             else if (formats.Contains("HTML Format") )
             {
                 obj = data.GetData("HTML Format");
-                found = true;
+                
             }
-            if (found)
+            if (obj != null)
             {
                 
                 string html = string.Empty;
@@ -494,24 +496,58 @@ namespace CoverArtJobby
                         html = System.Text.Encoding.ASCII.GetString(buffer);
                     }
                 }
+                bool success = false;
                 // Using a regex to parse HTML, but JUST FOR THIS EXAMPLE :-)
                 var match = new Regex(@"<img[^/]src=""([^""]*)""").Match(html);
                 if (match.Success)
                 {
                     Uri uri = new Uri(match.Groups[1].Value);
                     SetImageFromUri(uri);
+                    success = true;
                 }
-                else
+
+                //Youtube links need adjusting to redirect to the big image file
+                //"/url?q=https://www.youtube.com/watch%3Fv%3DUtM_Fp2Y0N0&
+                //match = new Regex(@"url\?q=https?://www.youtube.com/watch/(.*?)&").Match(html);
+                match = new Regex(@"youtube\.com/watch(.*?)&").Match(html);
+                if (success == false && match.Success)
                 {
-                    // Try look for a URL to an image, encoded (thanks google image search....)
-                    match = new Regex(@"url=(.*?)&").Match(html);
-                    //url=http%3A%2F%2Fi.imgur.com%2FK1lxb2L.jpg&amp
-                    if (match.Success)
-                    {
-                        Uri uri = new Uri(Uri.UnescapeDataString(match.Groups[1].Value));
-                        SetImageFromUri(uri);
-                    }
+
+                    string url = Uri.UnescapeDataString(match.Groups[1].Value) ;
+
+                    url = "http://img.youtube.com/vi/" + url.Substring(3) + "/maxresdefault.jpg";
+
+                    Uri uri = new Uri((url));
+                    SetImageFromUri(uri);
+
                 }
+
+                // Try look for a URL to an image, encoded (thanks google image search....)
+                //take the whole thing, unlike the youtube link
+                //"/url?q=https://open.spotify.com/artist/3bvwEfeJwge7783Pjv6tNI&amp;sa=U&amp;ved=0CBgQwW4wAWoVChMI8ub-lP2TyQIVwewUCh3nUwe3&amp;usg=AFQjCNHPJuYBhCnXyZVNIzvzESBo-z08Rw"
+                match = new Regex(@"url\?q=(http.*?)""").Match(html);
+                if (success == false && match.Success)
+                {
+                    string url = Uri.UnescapeDataString(match.Groups[1].Value);
+                    Uri uri = new Uri(url);
+                    SetImageFromUri(uri);
+                }
+
+
+
+
+                
+                match = new Regex(@"url=(http.*?)&").Match(html);
+                if (success == false && match.Success)
+                {
+                    //url=http%3A%2F%2Fi.imgur.com%2FK1lxb2L.jpg&amp
+                    Uri uri = new Uri(Uri.UnescapeDataString(match.Groups[1].Value));
+                    SetImageFromUri(uri);
+                }
+
+                
+
+
             }
         }
 
@@ -610,6 +646,56 @@ namespace CoverArtJobby
 
         private void btnGuessTag_Click(object sender, RoutedEventArgs e)
         {
+            guessTags(true);
+        }
+
+        private void guessTags(bool force)
+        {
+            string original = Tag_File.Text;
+            string artist = null;
+            string track = null;
+            string album = null;
+
+            //TODO other markers? 
+            //split this into an array of parts, separated by " - " 
+            string[] delimiters = { " - ", "_-_","-" };
+            List<string> parts = original.Split(delimiters, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            //remove anything that looks like a track number
+            List<string> removals = new List<string>();
+            foreach (string s in parts)
+            {
+                int trackinttest = -1;
+                if (int.TryParse(s.Trim(), out trackinttest))
+                {
+                    removals.Add( s);
+                }
+            }
+           foreach (string s in removals)
+            {
+                parts.Remove(s);
+            }
+            //todo - add trackpos to file tag
+            if (parts.Count() == 1)
+            {
+                track = parts[0];
+            }
+            else if (parts.Count() == 2)
+            {
+                artist = parts[0];
+                track = parts[1];
+            }
+            else if (parts.Count() >= 3)
+            {
+                artist = parts[0];
+                album = parts[1];
+                track = parts[2];
+            }
+
+            if (artist != null && (force || string.IsNullOrEmpty(Tag_Artist.Text))) { Tag_Artist.Text = artist; }
+            if (album != null && (force || string.IsNullOrEmpty(Tag_Album.Text))) { Tag_Album.Text = album; }
+            if (track != null && (force || string.IsNullOrEmpty(Tag_Song.Text))) { Tag_Song.Text = track; }
+
 
         }
 
