@@ -289,7 +289,7 @@ namespace CoverArtJobby
             bool firstItem = true;
             bool exit = false;
             bool invalidTag = false;
-            while(exit == false && currentIndex > -1 && currentIndex < FileList.Items.Count)
+            while(exit == false && currentIndex > -1 && currentIndex < FileList.Items.Count - 1)
             {
                 invalidTag = false;
                 if (firstItem && startAtZero)
@@ -614,7 +614,6 @@ namespace CoverArtJobby
 
         #endregion
 
-
         #region backups
 
         private void btnPickFolder_Click(object sender, RoutedEventArgs e)
@@ -636,8 +635,7 @@ namespace CoverArtJobby
         #endregion
 
 
-
-
+        
 
         private void btn_Exit_Click(object sender, RoutedEventArgs e)
         {

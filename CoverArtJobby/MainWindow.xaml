@@ -1,7 +1,7 @@
 ﻿<Window x:Class="CoverArtJobby.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="785" Width="1200" Name="mainWindow" AllowDrop="True" Drop="Tag_Image_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+        Title="Cover Art Jobby" Height="785" Width="1200" Name="mainWindow" AllowDrop="True" Drop="Tag_Image_Drop" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
     <Grid AllowDrop="True">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
