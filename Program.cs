@@ -90,6 +90,10 @@ namespace RandomFilePicker
                                         PickRandomFile.showStats = true;
                                         break;
 
+                                    case "-i":
+                                        PickRandomFile.ignoreMissingFolders = true;
+                                        break;
+
                                     case "-f":
                                         ParseMode = parseModes.filetype;
                                         PickRandomFile.usingFileTypes = true;
@@ -113,6 +117,7 @@ namespace RandomFilePicker
                                             "-o <ext> <app>" + "\t" + "Override app to open a filetype with" + "\n" +
                                             "-l <filename>" + "\t" + "Load a set of commands from a file" + "\n" +
                                             "-h" + "\t" + "Runs any spawned applications in the background" + "\n" +
+                                            "-i" + "\t" + "Silently ignore any missing directories" + "\n" +
                                             "-shuffle" + "\t" + "Picks one at a time until all files have been picked once" + "\n" +
                                             "-cache <min> <max>" + "\t" + "Cache file access for min < x < max hours" + "\n" +
                                             "-cachefolder <directory>" + "\t" + "Folder where cache data should be written" + "\n" +
@@ -156,6 +161,7 @@ namespace RandomFilePicker
                                     case "-l":
                                         ParseMode = parseModes.loadfile;
                                     break;
+                                        
 
                                     case "-cachestats":
                                         PickRandomFile.showCacheStats = true;

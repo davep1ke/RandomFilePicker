@@ -40,6 +40,7 @@ namespace RandomFilePicker
         public static bool showStats = false;
         public static bool useCache = false;
         public static bool showCacheStats = false;
+        public static bool ignoreMissingFolders = false;
 
         public static int cacheHoursMin = 0;
         public static int cacheHoursMax = 0;
@@ -311,7 +312,10 @@ namespace RandomFilePicker
             }
             catch (Exception e)
             {
-                MessageBox.Show("Exception when scanning folder" + dirName + "\n" + e.Message + "\n\n" + e.StackTrace + "\n\n" + e.Source);
+                if (!ignoreMissingFolders)
+                {
+                    MessageBox.Show("Exception when scanning folder" + dirName + "\n" + e.Message + "\n\n" + e.StackTrace + "\n\n" + e.Source);
+                }
             }
             finally
             {
