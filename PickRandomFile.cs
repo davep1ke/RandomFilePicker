@@ -98,7 +98,7 @@ namespace RandomFilePicker
                                 }
                             }
                         }
-                        else
+                        else if (!ignoreMissingFolders)
                         {
                             MessageBox.Show("Directory " + d.FullName + " doesnt exist");
                         }
